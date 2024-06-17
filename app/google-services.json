@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "256843983037",
+    "project_id": "waze-ss",
+    "storage_bucket": "waze-ss.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:256843983037:android:83db516f01e9e1c5aeefd4",
+        "android_client_info": {
+          "package_name": "com.wazesafespace"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjCMgjId7_vLiTTK2AU-5GCo3HlliaWas"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
