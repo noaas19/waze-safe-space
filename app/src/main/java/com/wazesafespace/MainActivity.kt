@@ -1,4 +1,6 @@
 package com.wazesafespace
+
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
@@ -15,20 +17,21 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
+import com.google.maps.android.PolyUtil
 import com.wazesafespace.ui.theme.WazeSafeSpaceTheme
 import okhttp3.*
+import org.json.JSONObject
 import java.io.IOException
 
 class MainActivity : FragmentActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private val TAG = "MainActivity"
-    private val DIRECTIONS_API_KEY = "YOUR_API_KEY_HERE"
+    private val DIRECTIONS_API_KEY = "AIzaSyBalGEcpzKfl4Aixz30b8-ggW0Yp1JTJXM"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,7 +69,7 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
         }
     }
 
-    override fun onMapReady(googleMap: GoogleMap) {
+    /*override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
         // Add a marker in Sydney and move the camera
@@ -76,6 +79,15 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
 
         // Fetch directions from a sample origin to destination
         fetchDirections(LatLng(-34.0, 151.0), LatLng(-33.8675, 151.2070))
+    }*/
+
+    override fun onMapReady(googleMap: GoogleMap) {
+        mMap = googleMap
+
+        // Fetch directions from Jerusalem to Tel Aviv
+        val jerusalem = LatLng(31.7683, 35.2137)
+        val telAviv = LatLng(32.0853, 34.7818)
+        fetchDirections(jerusalem, telAviv)
     }
 
     private fun fetchDirections(origin: LatLng, destination: LatLng) {
@@ -101,9 +113,45 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
                 val responseData = response.body?.string()
                 Log.d(TAG, "Directions API response: $responseData")
 
-                // TODO: Parse the response and update the UI with the directions
+                responseData?.let {
+                    val jsonResponse = JSONObject(it)
+                    val routes = jsonResponse.getJSONArray("routes")
+                    if (routes.length() > 0) {
+                        val overviewPolyline = routes.getJSONObject(0)
+                            .getJSONObject("overview_polyline")
+                            .getString("points")
+
+                        runOnUiThread {
+                            displayRoute(overviewPolyline)
+                        }
+                    }
+                }
             }
         })
+    }
+
+    private fun displayRoute(encodedPolyline: String) {
+        val decodedPath = PolyUtil.decode(encodedPolyline)
+        val polylineOptions = PolylineOptions()
+            .addAll(decodedPath)
+            .color(Color.BLUE)
+            .width(10f)
+
+        mMap.addPolyline(polylineOptions)
+
+        // Add markers at the start and end points
+        if (decodedPath.isNotEmpty()) {
+            mMap.addMarker(MarkerOptions().position(decodedPath[0]).title("Start"))
+            mMap.addMarker(MarkerOptions().position(decodedPath[decodedPath.size - 1]).title("End"))
+        }
+
+        // Move the camera to view the entire track
+        val builder = LatLngBounds.Builder()
+        for (point in decodedPath) {
+            builder.include(point)
+        }
+        val bounds = builder.build()
+        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
     }
 }
 
@@ -122,3 +170,4 @@ fun GreetingPreview() {
         Greeting("Android")
     }
 }
+
