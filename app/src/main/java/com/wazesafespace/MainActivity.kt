@@ -69,25 +69,18 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
         }
     }
 
-    /*override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
-
-        // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
-
-        // Fetch directions from a sample origin to destination
-        fetchDirections(LatLng(-34.0, 151.0), LatLng(-33.8675, 151.2070))
-    }*/
-
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-
-        // Fetch directions from Jerusalem to Tel Aviv
+        /*// Fetch directions from Jerusalem to Tel Aviv
         val jerusalem = LatLng(31.7683, 35.2137)
         val telAviv = LatLng(32.0853, 34.7818)
         fetchDirections(jerusalem, telAviv)
+         */
+
+        // Add a marker in a specific location (if needed)
+        val location = LatLng(-34.0, 151.0) // Replace with desired location coordinates
+        mMap.addMarker(MarkerOptions().position(location).title("Marker in Sydney"))
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(location))
     }
 
     private fun fetchDirections(origin: LatLng, destination: LatLng) {
@@ -158,7 +151,7 @@ class MainActivity : FragmentActivity(), OnMapReadyCallback {
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
     Text(
-        text = "Hello $name!",
+        text = "Hi $name!",
         modifier = modifier
     )
 }
@@ -170,4 +163,3 @@ fun GreetingPreview() {
         Greeting("Android")
     }
 }
-
